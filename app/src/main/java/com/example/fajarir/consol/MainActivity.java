@@ -2,13 +2,16 @@ package com.example.fajarir.consol;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.support.design.widget.TabLayout;
 import android.support.v4.util.PatternsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.fajarir.consol.data.DataManager;
 import com.qiscus.sdk.Qiscus;
 import com.qiscus.sdk.data.model.QiscusAccount;
 
@@ -20,20 +23,31 @@ import retrofit2.HttpException;
 public class MainActivity extends AppCompatActivity {
     public TextView name, email, pass;
     private ProgressDialog mProgressDialog;
+    private DataManager dataManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        dataManager = new DataManager(this);
+        checkUserIsExist();
         initialize();
     }
+
+    private void checkUserIsExist() {
+        if(!dataManager.getUserProfile().isEmpty()){
+            startActivity(new Intent(this, TabActivity.class));
+        }
+    }
+
 
     private void initialize() {
         name = (TextView) findViewById(R.id.name);
         email = (TextView) findViewById(R.id.email);
         pass = (TextView) findViewById(R.id.password);
-    }
 
+
+    }
 
     public void logindsn(View view) {
         String namadsn = name.getText().toString();
@@ -55,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
                     .save(new Qiscus.SetUserListener() {
                         @Override
                         public void onSuccess(QiscusAccount qiscusAccount) {
+                            dataManager.setUserProfile(emaildsn);
                             startActivity(new Intent(MainActivity.this, TabActivity.class));
                             dismissLoading();
                             finish();
@@ -66,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
                                 HttpException e = (HttpException) throwable;
                                 try {
                                     String errorMessage = e.response().errorBody().string();
-                                    // Log.e(this, errorMessage);
+                                     Log.e(String.valueOf(this), errorMessage);
                                     showError(errorMessage);
                                 } catch (IOException e1) {
                                     e1.printStackTrace();

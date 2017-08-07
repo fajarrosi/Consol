@@ -1,6 +1,5 @@
 package com.example.fajarir.consol;
 
-import android.support.annotation.DrawableRes;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -10,16 +9,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.example.fajarir.consol.chat.Chat;
 import com.example.fajarir.consol.chat.ChatFragment;
-import com.qiscus.sdk.Qiscus;
-
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 public class TabActivity extends AppCompatActivity {
 
@@ -37,6 +30,7 @@ public class TabActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+    private ChatFragment chatFragment;
 
 
     @Override
@@ -56,7 +50,25 @@ public class TabActivity extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
 
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if(tab.getPosition() == 1){
+                    chatFragment.notifyChangeData();
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
     }
 
 
@@ -103,9 +115,9 @@ public class TabActivity extends AppCompatActivity {
                     ContactFragment contact = new ContactFragment();
                     return contact;
                 case 1:
-                    ChatFragment chat = new ChatFragment();
+                    chatFragment = new ChatFragment();
 
-                    return chat;
+                    return chatFragment;
                 default:
                     return null;
             }
@@ -123,7 +135,7 @@ public class TabActivity extends AppCompatActivity {
                 case 0:
                     return "Contact";
                 case 1:
-                    return "Chat";
+                    return "Contact";
             }
             return null;
         }

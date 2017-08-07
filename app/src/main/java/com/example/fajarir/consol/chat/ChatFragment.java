@@ -12,8 +12,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.fajarir.consol.Contact;
 import com.example.fajarir.consol.R;
 import com.example.fajarir.consol.R2;
+import com.example.fajarir.consol.data.DataManager;
 import com.qiscus.sdk.Qiscus;
 
 import java.io.IOException;
@@ -32,8 +34,9 @@ public class ChatFragment extends Fragment {
     @BindView(R2.id.rv_chats)RecyclerView rvChats;
     private ChatAdapter adapter;
     private Unbinder unbinder;
-    ArrayList<Chat> chats;
+    ArrayList<Contact> contacts;
     private ProgressDialog mProgressDialog;
+    private DataManager dataManager;
 
     @Nullable
     @Override
@@ -50,18 +53,20 @@ public class ChatFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         rvChats.setLayoutManager(layoutManager);
         // Initialize contacts
-        chats = Chat.setChatList();
-        adapter = new ChatAdapter(chats,getContext());
+        dataManager = new DataManager(getContext());
+//        contacts = Contact.setChatList();
+        adapter = new ChatAdapter(dataManager.getListConsultation(), getContext());
+
         adapter.setOnClickListener(adapterPosition -> {
             OpenChatWith(adapter.getChats().get(adapterPosition));
         });
         rvChats.setAdapter(adapter);
     }
 
-    private void OpenChatWith(Chat chat) {
+    private void OpenChatWith(Contact contact) {
         showLoading();
-        Qiscus.buildChatWith(chat.getEmail())
-                .withTitle(chat.getName())
+        Qiscus.buildChatWith(contact.getEmail())
+                .withTitle(contact.getName())
                 .build(getContext(), new Qiscus.ChatActivityBuilderListener() {
                     @Override
                     public void onSuccess(Intent intent) {
@@ -142,4 +147,7 @@ public class ChatFragment extends Fragment {
     }
 
 
+    public void notifyChangeData() {
+        adapter.setData(dataManager.getListConsultation());
+    }
 }

@@ -8,16 +8,14 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.example.fajarir.consol.chat.Chat;
 import com.example.fajarir.consol.chat.ChatAdapter;
+import com.example.fajarir.consol.data.DataManager;
 import com.qiscus.sdk.Qiscus;
-import com.qiscus.sdk.ui.adapter.OnItemClickListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,10 +24,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import retrofit2.HttpException;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-
-import static com.example.fajarir.consol.MainActivity.revertCustomChatConfig;
 
 /**
  * Created by fajarir on 7/28/2017.
@@ -40,9 +34,11 @@ public class ContactFragment extends Fragment {
     private ContactAdapter adapter;
     private ChatAdapter adapter2;
     private Unbinder unbinder;
-    ArrayList<Contact> contacts;
-    ArrayList<Chat> chats;
+    ArrayList<com.example.fajarir.consol.Contact> contacts;
+//    ArrayList<com.example.fajarir.consol.chat.Contact> contacts = new ArrayList<>();
     private ProgressDialog mProgressDialog;
+    private DataManager dataManager;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater,@Nullable ViewGroup container,@Nullable
@@ -58,15 +54,16 @@ public class ContactFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         rvContacts.setLayoutManager(layoutManager);
         // Initialize contacts
-        contacts = Contact.setContactsList();
+        contacts = com.example.fajarir.consol.Contact.setContactsList();
         adapter = new ContactAdapter(contacts,getContext());
+        dataManager = new DataManager(getContext());
         rvContacts.setAdapter(adapter);
         adapter.setOnClickListener(adapterPosition -> {
                 OpenChatWith(adapter.getContacts().get(adapterPosition));
         });
     }
 
-    private void OpenChatWith(Contact contact) {
+    private void OpenChatWith(com.example.fajarir.consol.Contact contact) {
         showLoading();
         Qiscus.buildChatWith(contact.getEmail())
                 .withTitle(contact.getName())
@@ -74,8 +71,9 @@ public class ContactFragment extends Fragment {
                     @Override
                     public void onSuccess(Intent intent) {
                         startActivity(intent);
-                        chats.add(new Chat(contact.getEmail(),contact.getName()));
-                        adapter2.notifyDataSetChanged();
+                        dataManager.setListConsultation(contact);
+//                        contacts.add(new Contact(contact.getEmail(),contact.getName()));
+//                        adapter2.notifyDataSetChanged();
                         dismissLoading();
                     }
 

@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.example.fajarir.consol.Contact;
 import com.example.fajarir.consol.R;
 import java.util.List;
 
@@ -14,12 +16,14 @@ import java.util.List;
  */
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
-    public List<Chat> getChats() {
-        return mChats;
+
+
+    public List<Contact> getChats() {
+        return mContacts;
     }
 
     // Store a member variable for the chat
-    private List<Chat> mChats;
+    private List<Contact> mContacts;
     // Store the context for easy access
     private Context mContext;
     private OnClickListener onClickListener;
@@ -27,9 +31,14 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         this.onClickListener = onClickListener;
     }
 
-    public ChatAdapter(List<Chat> mChats, Context mContext) {
-        this.mChats = mChats;
+    public ChatAdapter(List<Contact> mContacts, Context mContext) {
+        this.mContacts = mContacts;
         this.mContext = mContext;
+    }
+
+    public void setData(List<Contact> contactList) {
+        this.mContacts = contactList;
+        notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -60,15 +69,18 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(ChatAdapter.ViewHolder holder, int position) {
         // Get the data model based on position
-        Chat chat = mChats.get(position);
+        Contact contact = mContacts.get(position);
 // Set item views based on your views and data model
         TextView textView = holder.itemName;
-        textView.setText(chat.getName());
+        textView.setText(contact.getName());
     }
 
     @Override
     public int getItemCount() {
-        return mChats.size();
+        if (mContacts == null) {
+            return 0;
+        }
+        return mContacts.size();
     }
 
     public interface OnClickListener{
